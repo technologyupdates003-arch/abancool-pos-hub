@@ -12,8 +12,15 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      heading: ['Urbanist', 'sans-serif'],
+      body: ['Epilogue', 'sans-serif'],
+    },
     extend: {
       colors: {
+        glow: "hsl(var(--glow))",
+        surface: "hsl(var(--surface))",
+        "surface-hover": "hsl(var(--surface-hover))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
