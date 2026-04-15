@@ -17,6 +17,7 @@ const Orders = () => {
 
   return (
     <DashboardLayout>
+      <SubscriptionGate feature="Orders">
       <h1 className="font-heading text-2xl font-bold mb-6">Orders</h1>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
@@ -53,6 +54,7 @@ const Orders = () => {
           </table>
         </div>
       </div>
+      </SubscriptionGate>
     </DashboardLayout>
   );
 };

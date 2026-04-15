@@ -77,6 +77,7 @@ const Products = () => {
 
   return (
     <DashboardLayout>
+      <SubscriptionGate feature="Product Management">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold">Products</h1>
         {canManage && (
@@ -151,6 +152,7 @@ const Products = () => {
           </table>
         </div>
       </div>
+      </SubscriptionGate>
     </DashboardLayout>
   );
 };
