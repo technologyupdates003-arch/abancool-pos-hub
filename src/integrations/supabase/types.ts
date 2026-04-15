@@ -314,6 +314,51 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          billing_period: string | null
+          business_id: string
+          checkout_request_id: string | null
+          created_at: string
+          id: string
+          invoice_id: string | null
+          mpesa_receipt: string | null
+          phone_number: string
+          plan_slug: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          billing_period?: string | null
+          business_id: string
+          checkout_request_id?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          mpesa_receipt?: string | null
+          phone_number: string
+          plan_slug?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          billing_period?: string | null
+          business_id?: string
+          checkout_request_id?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          mpesa_receipt?: string | null
+          phone_number?: string
+          plan_slug?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string | null
