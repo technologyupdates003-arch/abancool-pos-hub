@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "@/hooks/use-toast";
 
 const Subscribe = () => {
-  const { activeBusiness } = useBusiness();
+  const { business: activeBusiness } = useBusiness();
   const { user } = useAuth();
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
