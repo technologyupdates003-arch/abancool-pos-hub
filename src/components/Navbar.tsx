@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Shield } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -14,6 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { user, isAdmin } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
@@ -43,12 +45,29 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Log in</Button>
-          </Link>
-          <Link to="/register">
-            <Button variant="hero" size="sm">Start Free</Button>
-          </Link>
+          {user ? (
+            <>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    <Shield size={14} /> Admin
+                  </Button>
+                </Link>
+              )}
+              <Link to="/dashboard">
+                <Button variant="hero" size="sm">Dashboard</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm">Log in</Button>
+              </Link>
+              <Link to="/register">
+                <Button variant="hero" size="sm">Start Free</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -71,12 +90,27 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="flex gap-2 mt-3">
-            <Link to="/login" className="flex-1">
-              <Button variant="ghost" size="sm" className="w-full">Log in</Button>
-            </Link>
-            <Link to="/register" className="flex-1">
-              <Button variant="hero" size="sm" className="w-full">Start Free</Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/dashboard" className="flex-1" onClick={() => setOpen(false)}>
+                  <Button variant="hero" size="sm" className="w-full">Dashboard</Button>
+                </Link>
+                {isAdmin && (
+                  <Link to="/admin" className="flex-1" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full gap-1"><Shield size={14} /> Admin</Button>
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>
+                  <Button variant="ghost" size="sm" className="w-full">Log in</Button>
+                </Link>
+                <Link to="/register" className="flex-1" onClick={() => setOpen(false)}>
+                  <Button variant="hero" size="sm" className="w-full">Start Free</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

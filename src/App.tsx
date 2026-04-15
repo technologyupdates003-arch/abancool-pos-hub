@@ -20,6 +20,7 @@ import POSInterface from "./pages/dashboard/POSInterface";
 import Staff from "./pages/dashboard/Staff";
 import Reports from "./pages/dashboard/Reports";
 import SettingsPage from "./pages/dashboard/Settings";
+import Subscribe from "./pages/dashboard/Subscribe";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminBusinesses from "./pages/admin/AdminBusinesses";
 import AdminBusinessDetail from "./pages/admin/AdminBusinessDetail";

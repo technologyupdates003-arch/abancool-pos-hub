@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor, CreditCard } from "lucide-react";
 import { ReactNode, useState } from "react";
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { label: "Orders", icon: ShoppingCart, to: "/dashboard/orders" },
   { label: "Staff", icon: Users, to: "/dashboard/staff" },
   { label: "Reports", icon: BarChart3, to: "/dashboard/reports" },
+  { label: "Subscription", icon: CreditCard, to: "/dashboard/subscribe" },
   { label: "Settings", icon: Settings, to: "/dashboard/settings" },
 ];
 
