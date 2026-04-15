@@ -20,7 +20,15 @@ import POSInterface from "./pages/dashboard/POSInterface";
 import Staff from "./pages/dashboard/Staff";
 import Reports from "./pages/dashboard/Reports";
 import SettingsPage from "./pages/dashboard/Settings";
-import AdminPanel from "./pages/admin/AdminPanel";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminBusinesses from "./pages/admin/AdminBusinesses";
+import AdminBusinessDetail from "./pages/admin/AdminBusinessDetail";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,7 +56,15 @@ const App = () => (
               <Route path="/dashboard/staff" element={<ProtectedRoute><Staff /></ProtectedRoute>} />
               <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
               <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+              <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
+              <Route path="/admin/businesses" element={<AdminRoute><AdminBusinesses /></AdminRoute>} />
+              <Route path="/admin/businesses/:id" element={<AdminRoute><AdminBusinessDetail /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+              <Route path="/admin/subscriptions" element={<AdminRoute><AdminSubscriptions /></AdminRoute>} />
+              <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+              <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogs /></AdminRoute>} />
+              <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+              <Route path="/admin/notifications" element={<AdminRoute><AdminNotifications /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BusinessProvider>
