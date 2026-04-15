@@ -49,10 +49,15 @@ const Register = () => {
     }
 
     if (authData.user) {
-      // Create business
+      // Create business with subscription_status pending (must pay)
       const { data: biz, error: bizErr } = await supabase
         .from("businesses")
-        .insert({ name: form.business, type: form.type as any })
+        .insert({
+          name: form.business,
+          type: form.type as any,
+          subscription_status: "suspended" as any,
+          subscription_plan: null,
+        })
         .select()
         .single();
 
@@ -64,8 +69,8 @@ const Register = () => {
         });
       }
 
-      toast({ title: "Account created!", description: "Check your email to verify your account." });
-      navigate("/dashboard");
+      toast({ title: "Account created!", description: "Check your email to verify, then subscribe to activate your business." });
+      navigate("/dashboard/subscribe");
     }
     setLoading(false);
   };
@@ -77,7 +82,7 @@ const Register = () => {
         <div className="w-full max-w-md mx-auto px-4">
           <div className="rounded-2xl border border-border bg-card p-8">
             <h1 className="font-heading text-2xl font-bold mb-1">Create your account</h1>
-            <p className="text-sm text-muted-foreground font-body mb-6">Start your 14-day free trial</p>
+            <p className="text-sm text-muted-foreground font-body mb-6">Register your business and choose a plan</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input placeholder="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
               <input type="email" placeholder="Email address" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
