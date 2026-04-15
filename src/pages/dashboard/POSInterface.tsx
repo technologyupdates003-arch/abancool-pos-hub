@@ -92,12 +92,14 @@ const POSInterface = () => {
     }));
     await supabase.from("order_items").insert(items);
 
-    // Deduct stock
+    // Deduct stock manually
     for (const item of cart) {
-      await supabase.rpc("deduct_stock" as any, { p_product_id: item.product_id, p_quantity: item.quantity }).catch(() => {
-        // If RPC doesn't exist, do manual update
-        supabase.from("products").update({ stock_quantity: products.find(p => p.id === item.product_id)?.stock_quantity - item.quantity }).eq("id", item.product_id);
-      });
+      const prod = products.find(p => p.id === item.product_id);
+      if (prod) {
+        await supabase.from("products").update({
+          stock_quantity: Math.max(0, prod.stock_quantity - item.quantity)
+        }).eq("id", item.product_id);
+      }
     }
 
     toast({ title: "Order complete!", description: `${orderNumber} — KES ${total.toLocaleString()}` });
