@@ -16,7 +16,7 @@ interface CartItem {
 }
 
 const POSInterface = () => {
-  const { business } = useBusiness();
+  const { business, isSubscribed } = useBusiness();
   const { user } = useAuth();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);

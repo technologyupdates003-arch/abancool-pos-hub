@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, Lock } from "lucide-react";
 
 interface SubscriptionGateProps {
-  children: ReactNode;
+  children?: ReactNode;
   feature?: string;
 }
 
