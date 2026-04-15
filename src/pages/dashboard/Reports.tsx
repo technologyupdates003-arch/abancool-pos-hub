@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useBusiness } from "@/contexts/BusinessContext";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import SubscriptionGate from "@/components/SubscriptionGate";
 
 const Reports = () => {
   const { business } = useBusiness();

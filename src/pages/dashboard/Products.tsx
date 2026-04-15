@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SubscriptionGate from "@/components/SubscriptionGate";
 
 const Products = () => {
   const { business, memberRole } = useBusiness();
