@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Plus, Minus, Trash2, Search, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SubscriptionGate from "@/components/SubscriptionGate";
+import DashboardLayout from "@/components/DashboardLayout";
 
 interface CartItem {
   product_id: string;
@@ -14,7 +16,7 @@ interface CartItem {
 }
 
 const POSInterface = () => {
-  const { business } = useBusiness();
+  const { business, isSubscribed } = useBusiness();
   const { user } = useAuth();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
@@ -114,7 +116,13 @@ const POSInterface = () => {
     return matchSearch && matchCat;
   });
 
-  if (!business) return <div className="p-8 text-center text-muted-foreground">No business selected</div>;
+  if (!business) return <DashboardLayout><div className="p-8 text-center text-muted-foreground">No business selected</div></DashboardLayout>;
+
+  if (!isSubscribed) return (
+    <DashboardLayout>
+      <SubscriptionGate feature="POS System" />
+    </DashboardLayout>
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">

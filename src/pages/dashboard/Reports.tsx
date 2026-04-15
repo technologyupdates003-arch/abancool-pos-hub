@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useBusiness } from "@/contexts/BusinessContext";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import SubscriptionGate from "@/components/SubscriptionGate";
 
 const Reports = () => {
   const { business } = useBusiness();
@@ -43,6 +44,7 @@ const Reports = () => {
 
   return (
     <DashboardLayout>
+      <SubscriptionGate feature="Reports">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold">Reports</h1>
         <div className="flex gap-1 bg-muted rounded-lg p-1">
@@ -90,6 +92,7 @@ const Reports = () => {
           </div>
         )}
       </div>
+      </SubscriptionGate>
     </DashboardLayout>
   );
 };

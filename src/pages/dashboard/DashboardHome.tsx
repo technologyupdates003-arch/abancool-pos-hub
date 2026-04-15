@@ -3,16 +3,19 @@ import { useBusiness } from "@/contexts/BusinessContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
-import { TrendingUp, ShoppingCart, Package, DollarSign } from "lucide-react";
+import { TrendingUp, ShoppingCart, Package, DollarSign, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const DashboardHome = () => {
-  const { business } = useBusiness();
+  const { business, isSubscribed, loading: bizLoading } = useBusiness();
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({ orders: 0, revenue: 0, products: 0, todayOrders: 0 });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!business) return;
+    if (!business || !isSubscribed) return;
     const fetchStats = async () => {
       const { count: orderCount } = await supabase
         .from("orders").select("*", { count: "exact", head: true })
@@ -41,13 +44,39 @@ const DashboardHome = () => {
       setRecentOrders(recent ?? []);
     };
     fetchStats();
-  }, [business]);
+  }, [business, isSubscribed]);
+
+  if (bizLoading) return (
+    <DashboardLayout>
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    </DashboardLayout>
+  );
 
   if (!business) return (
     <DashboardLayout>
       <div className="text-center py-20">
         <h2 className="font-heading text-2xl font-bold mb-2">No Business Found</h2>
         <p className="text-muted-foreground font-body">Create a business to get started.</p>
+      </div>
+    </DashboardLayout>
+  );
+
+  // Show subscription prompt if not subscribed
+  if (!isSubscribed) return (
+    <DashboardLayout>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
+          <AlertTriangle size={28} className="text-amber-400" />
+        </div>
+        <h2 className="font-heading text-2xl font-bold mb-2">Activate Your Business</h2>
+        <p className="text-muted-foreground font-body text-sm max-w-md mb-6">
+          Welcome to Abancool! Subscribe to a plan to start using your POS system. Every business needs an active subscription.
+        </p>
+        <Button variant="hero" onClick={() => navigate("/dashboard/subscribe")} className="gap-2">
+          <ShoppingCart size={16} /> Choose a Plan
+        </Button>
       </div>
     </DashboardLayout>
   );
