@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       business_members: {
         Row: {
           business_id: string
@@ -388,6 +454,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_products: number | null
+          max_staff: number | null
+          name: string
+          price_monthly: number
+          price_yearly: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_products?: number | null
+          max_staff?: number | null
+          name: string
+          price_monthly?: number
+          price_yearly?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_products?: number | null
+          max_staff?: number | null
+          name?: string
+          price_monthly?: number
+          price_yearly?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      system_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
