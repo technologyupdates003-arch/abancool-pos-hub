@@ -24,7 +24,8 @@ const BusinessContext = createContext<BusinessContextType>({
 export const useBusiness = () => useContext(BusinessContext);
 
 export const BusinessProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const location = useLocation();
   const [business, setBusiness] = useState<Business | null>(null);
   const [memberRole, setMemberRole] = useState<MemberRole | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -32,6 +33,24 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchBusinesses = async () => {
     if (!user) { setBusinesses([]); setBusiness(null); setLoading(false); return; }
+
+    // Check for admin impersonation
+    const impersonateId = sessionStorage.getItem("admin_impersonate_business_id");
+    if (isAdmin && impersonateId && !location.pathname.startsWith("/admin")) {
+      const { data: impBiz } = await supabase.from("businesses").select("*").eq("id", impersonateId).single();
+      if (impBiz) {
+        setBusinesses([impBiz]);
+        setBusiness(impBiz);
+        setMemberRole("owner");
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Clear impersonation when navigating to admin
+    if (location.pathname.startsWith("/admin")) {
+      sessionStorage.removeItem("admin_impersonate_business_id");
+    }
     
     const { data: members } = await supabase
       .from("business_members")
@@ -58,7 +77,7 @@ export const BusinessProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchBusinesses(); }, [user]);
+  useEffect(() => { fetchBusinesses(); }, [user, location.pathname]);
 
   const selectBusiness = (id: string) => {
     const biz = businesses.find((b) => b.id === id);
