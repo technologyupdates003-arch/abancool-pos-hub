@@ -64,7 +64,7 @@ const Navbar = () => {
                 <Button variant="ghost" size="sm">Log in</Button>
               </Link>
               <Link to="/register">
-                <Button variant="hero" size="sm">Start Free</Button>
+                <Button variant="hero" size="sm">Get Started</Button>
               </Link>
             </>
           )}
@@ -107,7 +107,7 @@ const Navbar = () => {
                   <Button variant="ghost" size="sm" className="w-full">Log in</Button>
                 </Link>
                 <Link to="/register" className="flex-1" onClick={() => setOpen(false)}>
-                  <Button variant="hero" size="sm" className="w-full">Start Free</Button>
+                  <Button variant="hero" size="sm" className="w-full">Get Started</Button>
                 </Link>
               </>
             )}
