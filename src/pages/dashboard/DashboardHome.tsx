@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const DashboardHome = () => {
-  const { business, isSubscribed, loading: bizLoading } = useBusiness();
+  const { business, isSubscribed } = useBusiness();
   const { profile } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({ orders: 0, revenue: 0, products: 0, todayOrders: 0 });
@@ -46,14 +46,6 @@ const DashboardHome = () => {
     fetchStats();
   }, [business, isSubscribed]);
 
-  if (bizLoading) return (
-    <DashboardLayout>
-      <div className="flex justify-center py-20">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    </DashboardLayout>
-  );
-
   if (!business) return (
     <DashboardLayout>
       <div className="text-center py-20">
@@ -63,7 +55,6 @@ const DashboardHome = () => {
     </DashboardLayout>
   );
 
-  // Show subscription prompt if not subscribed
   if (!isSubscribed) return (
     <DashboardLayout>
       <div className="flex flex-col items-center justify-center py-20 text-center">
