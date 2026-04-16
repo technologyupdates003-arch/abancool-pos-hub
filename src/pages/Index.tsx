@@ -168,7 +168,7 @@ const Index = () => (
           </p>
           <Link to="/register">
             <Button variant="hero" size="lg" className="text-base px-10">
-              Start Your Free Trial <ArrowRight size={18} />
+              Get Started <ArrowRight size={18} />
             </Button>
           </Link>
         </div>
