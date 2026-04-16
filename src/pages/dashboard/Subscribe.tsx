@@ -13,19 +13,15 @@ const Subscribe = () => {
   const { business: activeBusiness } = useBusiness();
   const { user } = useAuth();
   const [plans, setPlans] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [paying, setPaying] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
-  const [paymentId, setPaymentId] = useState<string | null>(null);
-  const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("subscription_plans").select("*").eq("is_active", true).order("price_monthly").then(({ data }) => {
       setPlans(data ?? []);
-      setLoading(false);
     });
   }, []);
 
@@ -53,13 +49,9 @@ const Subscribe = () => {
         return;
       }
 
-      setPaymentId(data.payment_id);
-      setInvoiceId(data.invoice_id);
       toast({ title: "STK Push sent!", description: "Check your phone and enter M-Pesa PIN to complete payment." });
       setPaying(false);
       setCheckingStatus(true);
-
-      // Poll for status
       pollStatus(data.payment_id, data.invoice_id);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -88,9 +80,7 @@ const Subscribe = () => {
           setCheckingStatus(false);
           toast({ title: "Payment failed", description: "The M-Pesa transaction was not completed.", variant: "destructive" });
         }
-      } catch {
-        // continue polling
-      }
+      } catch {}
 
       if (attempts >= maxAttempts) {
         clearInterval(interval);
@@ -100,10 +90,6 @@ const Subscribe = () => {
     }, 5000);
   };
 
-  if (loading) {
-    return <DashboardLayout><div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div></DashboardLayout>;
-  }
-
   const currentPlan = activeBusiness?.subscription_plan;
 
   return (
@@ -112,12 +98,11 @@ const Subscribe = () => {
         <div>
           <h1 className="font-heading text-2xl font-bold">Subscription</h1>
           <p className="text-muted-foreground font-body text-sm">
-            Current plan: <span className="text-primary font-medium capitalize">{currentPlan || "Trial"}</span>
-            {" · "}Status: <span className="capitalize">{activeBusiness?.subscription_status || "trial"}</span>
+            Current plan: <span className="text-primary font-medium capitalize">{currentPlan || "None"}</span>
+            {" · "}Status: <span className="capitalize">{activeBusiness?.subscription_status || "inactive"}</span>
           </p>
         </div>
 
-        {/* Billing toggle */}
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => setBillingPeriod("monthly")}
@@ -129,7 +114,6 @@ const Subscribe = () => {
           >Yearly <span className="text-xs opacity-75">(Save 15%)</span></button>
         </div>
 
-        {/* Plans */}
         <div className="grid md:grid-cols-3 gap-6">
           {plans.map((plan) => {
             const price = billingPeriod === "yearly" ? plan.price_yearly : plan.price_monthly;
@@ -167,7 +151,6 @@ const Subscribe = () => {
         </div>
       </div>
 
-      {/* Payment Dialog */}
       <Dialog open={!!selectedPlan} onOpenChange={() => { if (!paying && !checkingStatus) setSelectedPlan(null); }}>
         <DialogContent>
           <DialogHeader>
