@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    /* Abancool theme — deep navy + bright royal blue */
-    --background: 222 47% 6%;
-    --foreground: 210 30% 96%;
+    /* Abancool theme — white + bright royal blue */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
-    --card: 222 45% 9%;
-    --card-foreground: 210 30% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 45% 9%;
-    --popover-foreground: 210 30% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
     --primary: 217 91% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 40% 13%;
-    --secondary-foreground: 210 25% 90%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 222 35% 15%;
-    --muted-foreground: 215 16% 60%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 45%;
 
     --accent: 217 91% 55%;
     --accent-foreground: 0 0% 100%;
@@ -29,28 +29,28 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 30% 18%;
-    --input: 222 30% 18%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 217 91% 55%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 25% 88%;
+    --sidebar-background: 210 40% 98%;
+    --sidebar-foreground: 222 47% 11%;
     --sidebar-primary: 217 91% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 35% 14%;
-    --sidebar-accent-foreground: 210 25% 88%;
-    --sidebar-border: 222 30% 18%;
+    --sidebar-accent: 210 40% 94%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
     --sidebar-ring: 217 91% 55%;
 
-    /* Custom tokens — Abancool blue glow */
+    /* Custom tokens — Abancool light */
     --glow: 217 91% 60%;
-    --glow-soft: 217 80% 45%;
-    --surface: 222 42% 11%;
-    --surface-hover: 222 38% 14%;
+    --glow-soft: 217 80% 75%;
+    --surface: 210 40% 98%;
+    --surface-hover: 210 40% 94%;
     --hero-gradient: linear-gradient(135deg, hsl(217 91% 55%) 0%, hsl(220 90% 45%) 50%, hsl(225 85% 35%) 100%);
-    --text-gradient: linear-gradient(135deg, hsl(217 91% 65%), hsl(210 100% 80%));
+    --text-gradient: linear-gradient(135deg, hsl(217 91% 50%), hsl(220 90% 40%));
   }
 }
 
