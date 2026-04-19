@@ -55,6 +55,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       if (!s) setLoading(false);
+      // Safety: never let loading hang
+      setTimeout(() => setLoading(false), 3000);
     });
 
     return () => subscription.unsubscribe();

@@ -4,52 +4,53 @@
 
 @layer base {
   :root {
-    --background: 240 20% 4%;
-    --foreground: 240 10% 92%;
+    /* Abancool theme — deep navy + bright royal blue */
+    --background: 222 47% 6%;
+    --foreground: 210 30% 96%;
 
-    --card: 240 18% 7%;
-    --card-foreground: 240 10% 92%;
+    --card: 222 45% 9%;
+    --card-foreground: 210 30% 96%;
 
-    --popover: 240 18% 7%;
-    --popover-foreground: 240 10% 92%;
+    --popover: 222 45% 9%;
+    --popover-foreground: 210 30% 96%;
 
-    --primary: 239 84% 67%;
+    --primary: 217 91% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 15% 12%;
-    --secondary-foreground: 240 10% 85%;
+    --secondary: 222 40% 13%;
+    --secondary-foreground: 210 25% 90%;
 
-    --muted: 240 12% 14%;
-    --muted-foreground: 240 8% 55%;
+    --muted: 222 35% 15%;
+    --muted-foreground: 215 16% 60%;
 
-    --accent: 239 84% 67%;
+    --accent: 217 91% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 12% 16%;
-    --input: 240 12% 16%;
-    --ring: 239 84% 67%;
+    --border: 222 30% 18%;
+    --input: 222 30% 18%;
+    --ring: 217 91% 55%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 240 18% 5%;
-    --sidebar-foreground: 240 10% 85%;
-    --sidebar-primary: 239 84% 67%;
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 25% 88%;
+    --sidebar-primary: 217 91% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 12% 14%;
-    --sidebar-accent-foreground: 240 10% 85%;
-    --sidebar-border: 240 12% 16%;
-    --sidebar-ring: 239 84% 67%;
+    --sidebar-accent: 222 35% 14%;
+    --sidebar-accent-foreground: 210 25% 88%;
+    --sidebar-border: 222 30% 18%;
+    --sidebar-ring: 217 91% 55%;
 
-    /* Custom tokens */
-    --glow: 239 84% 67%;
-    --glow-soft: 239 60% 50%;
-    --surface: 240 16% 9%;
-    --surface-hover: 240 14% 12%;
-    --hero-gradient: linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(260 70% 55%) 50%, hsl(280 60% 45%) 100%);
-    --text-gradient: linear-gradient(135deg, hsl(239 84% 67%), hsl(260 90% 80%));
+    /* Custom tokens — Abancool blue glow */
+    --glow: 217 91% 60%;
+    --glow-soft: 217 80% 45%;
+    --surface: 222 42% 11%;
+    --surface-hover: 222 38% 14%;
+    --hero-gradient: linear-gradient(135deg, hsl(217 91% 55%) 0%, hsl(220 90% 45%) 50%, hsl(225 85% 35%) 100%);
+    --text-gradient: linear-gradient(135deg, hsl(217 91% 65%), hsl(210 100% 80%));
   }
 }
 
