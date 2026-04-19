@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   session: Session | null;
@@ -19,6 +18,26 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const fetchExtras = async (
+  userId: string,
+  setProfile: (p: any) => void,
+  setIsAdmin: (b: boolean) => void,
+) => {
+  // Run in background — don't block UI
+  supabase
+    .from("profiles")
+    .select("full_name, avatar_url")
+    .eq("user_id", userId)
+    .maybeSingle()
+    .then(({ data }) => setProfile(data ?? null));
+
+  supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .then(({ data }) => setIsAdmin(data?.some((r: any) => r.role === "admin") ?? false));
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -27,36 +46,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, sess) => {
+    // 1. Subscribe to changes (sync handler — never await inside)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       setUser(sess?.user ?? null);
-
+      setLoading(false);
       if (sess?.user) {
-        // Fetch profile
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("user_id", sess.user.id)
-          .single();
-        setProfile(prof);
-
-        // Check admin role
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", sess.user.id);
-        setIsAdmin(roles?.some((r) => r.role === "admin") ?? false);
+        fetchExtras(sess.user.id, setProfile, setIsAdmin);
       } else {
         setProfile(null);
         setIsAdmin(false);
       }
-      setLoading(false);
     });
 
+    // 2. Initial session check
     supabase.auth.getSession().then(({ data: { session: s } }) => {
-      if (!s) setLoading(false);
-      // Safety: never let loading hang
-      setTimeout(() => setLoading(false), 3000);
+      setSession(s);
+      setUser(s?.user ?? null);
+      setLoading(false);
+      if (s?.user) fetchExtras(s.user.id, setProfile, setIsAdmin);
     });
 
     return () => subscription.unsubscribe();
