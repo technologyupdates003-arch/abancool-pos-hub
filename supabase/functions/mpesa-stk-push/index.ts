@@ -13,9 +13,36 @@ const jsonResponse = (body: Record<string, unknown>, status = 200) =>
 const formatPhoneNumber = (phoneNumber: string) =>
   phoneNumber.replace(/\s+/g, "").replace(/^0/, "254").replace(/^\+/, "");
 
-const keysMatchEnvironment = (secretKey: string, publishableKey: string, environment: string) => {
-  const expectedKeyword = environment === "live" ? "live" : "test";
-  return secretKey.includes(expectedKeyword) && publishableKey.includes(expectedKeyword);
+const normalizeEnvironment = (value: string | undefined) => {
+  const raw = (value || "").toLowerCase().trim();
+  return ["live", "production", "prod"].includes(raw) ? "live" : "sandbox";
+};
+
+const getKeyMode = (value: string) => {
+  if (value.includes("_live_")) return "live";
+  if (value.includes("_test_")) return "test";
+  return "unknown";
+};
+
+const resolveIntaSendCredentials = (
+  firstKey: string,
+  secondKey: string,
+  environment: "live" | "sandbox",
+) => {
+  const expectedMode = environment === "live" ? "live" : "test";
+  const candidates = [firstKey, secondKey];
+  const modeMatched = candidates.filter((key) => getKeyMode(key) === expectedMode);
+
+  const secretToken = modeMatched.find((key) => key.startsWith(`ISSecretKey_${expectedMode}_`));
+  const publishableToken = modeMatched.find((key) => key.startsWith(`ISPubKey_${expectedMode}_`));
+
+  return {
+    expectedMode,
+    secretToken,
+    publishableToken,
+    firstKeyMode: getKeyMode(firstKey),
+    secondKeyMode: getKeyMode(secondKey),
+  };
 };
 
 Deno.serve(async (req) => {
@@ -24,54 +51,52 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY");
-    const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
-    const rawEnv = (Deno.env.get("INTASEND_ENVIRONMENT") || "").toLowerCase().trim();
-    const isLive = ["live", "production", "prod"].includes(rawEnv);
-    const INTASEND_ENVIRONMENT = isLive ? "live" : "sandbox";
+    const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY")?.trim();
+    const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY")?.trim();
+    const INTASEND_ENVIRONMENT = normalizeEnvironment(Deno.env.get("INTASEND_ENVIRONMENT"));
 
     if (!INTASEND_API_KEY || !INTASEND_PUBLISHABLE_KEY) {
       return jsonResponse({ error: "IntaSend keys not configured" }, 500);
     }
 
-    // Validate key prefixes match environment (IntaSend uses ISPubKey_live_ / ISPubKey_test_)
-    const keyEnv = INTASEND_API_KEY.includes("_live_") || INTASEND_PUBLISHABLE_KEY.includes("_live_") ? "live" : "test";
-    const expectedKeyEnv = isLive ? "live" : "test";
-    if (keyEnv !== expectedKeyEnv) {
+    const credentials = resolveIntaSendCredentials(
+      INTASEND_API_KEY,
+      INTASEND_PUBLISHABLE_KEY,
+      INTASEND_ENVIRONMENT,
+    );
+
+    if (!credentials.secretToken || !credentials.publishableToken) {
       return jsonResponse({
-        error: `IntaSend key/environment mismatch`,
-        details: `INTASEND_ENVIRONMENT is "${rawEnv}" (treated as ${INTASEND_ENVIRONMENT}) but your API keys are ${keyEnv} keys. Use ${expectedKeyEnv} keys, or set INTASEND_ENVIRONMENT to "${keyEnv === "live" ? "production" : "sandbox"}".`,
+        error: "IntaSend key/environment mismatch",
+        details: `Environment is ${INTASEND_ENVIRONMENT}. Expected one live/test secret key and one matching publishable key. Found key modes: INTASEND_API_KEY=${credentials.firstKeyMode}, INTASEND_PUBLISHABLE_KEY=${credentials.secondKeyMode}.`,
       }, 500);
     }
 
-    const baseUrl = isLive
+    const authToken = credentials.secretToken;
+    const baseUrl = INTASEND_ENVIRONMENT === "live"
       ? "https://payment.intasend.com/api/v1"
       : "https://sandbox.intasend.com/api/v1";
 
     const payload = await req.json();
     const { action, phone_number, amount, business_id, plan_slug, billing_period, invoice_id, payment_id } = payload;
 
-    // Create Supabase client with service role for DB operations
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     if (action === "initiate") {
-      // Validate inputs
       if (!phone_number || !amount || !business_id || !plan_slug) {
         return jsonResponse({ error: "Missing required fields" }, 400);
       }
 
-      // Format phone number for IntaSend (254XXXXXXXXX)
       const formattedPhone = formatPhoneNumber(phone_number);
 
-      // Initiate STK Push via IntaSend
       const stkResponse = await fetch(`${baseUrl}/payment/mpesa-stk-push/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${INTASEND_API_KEY}`,
+          "Authorization": `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           amount: Number(amount),
@@ -88,7 +113,6 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: "Failed to initiate M-Pesa payment", details: stkData }, 400);
       }
 
-      // Save payment record
       const { data: payment, error: dbError } = await supabase.from("payments").insert({
         business_id,
         amount: Number(amount),
@@ -117,13 +141,11 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: "invoice_id or payment_id required" }, 400);
       }
 
-      // Check payment status from IntaSend
-      let checkUrl = `${baseUrl}/payment/status/`;
-      const statusResponse = await fetch(checkUrl, {
+      const statusResponse = await fetch(`${baseUrl}/payment/status/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${INTASEND_API_KEY}`,
+          "Authorization": `Bearer ${authToken}`,
         },
         body: JSON.stringify({ invoice_id }),
       });
@@ -131,7 +153,6 @@ Deno.serve(async (req) => {
       const statusData = await statusResponse.json();
 
       if (statusData.invoice?.state === "COMPLETE" || statusData.state === "COMPLETE") {
-        // Update payment record
         if (payment_id) {
           await supabase.from("payments").update({
             status: "completed",
@@ -139,7 +160,6 @@ Deno.serve(async (req) => {
           }).eq("id", payment_id);
         }
 
-        // Update business subscription
         const { data: paymentRecord } = await supabase
           .from("payments")
           .select("business_id, plan_slug, billing_period")
@@ -157,7 +177,6 @@ Deno.serve(async (req) => {
             trial_ends_at: expiryDate.toISOString(),
           }).eq("id", paymentRecord.business_id);
 
-          // Audit log
           await supabase.from("audit_logs").insert({
             action: "subscription_payment",
             entity_type: "payment",
