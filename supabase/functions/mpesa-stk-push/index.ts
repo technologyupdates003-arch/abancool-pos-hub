@@ -5,6 +5,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json" };
+
+const jsonResponse = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: jsonHeaders });
+
+const formatPhoneNumber = (phoneNumber: string) =>
+  phoneNumber.replace(/\s+/g, "").replace(/^0/, "254").replace(/^\+/, "");
+
+const keysMatchEnvironment = (secretKey: string, publishableKey: string, environment: string) => {
+  const expectedKeyword = environment === "live" ? "live" : "test";
+  return secretKey.includes(expectedKeyword) && publishableKey.includes(expectedKeyword);
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -13,19 +26,25 @@ Deno.serve(async (req) => {
   try {
     const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY");
     const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
-    const INTASEND_ENVIRONMENT = Deno.env.get("INTASEND_ENVIRONMENT") || "sandbox";
+    const INTASEND_ENVIRONMENT = Deno.env.get("INTASEND_ENVIRONMENT") === "live" ? "live" : "sandbox";
 
     if (!INTASEND_API_KEY || !INTASEND_PUBLISHABLE_KEY) {
-      return new Response(JSON.stringify({ error: "IntaSend keys not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonResponse({ error: "IntaSend keys not configured" }, 500);
+    }
+
+    if (!keysMatchEnvironment(INTASEND_API_KEY, INTASEND_PUBLISHABLE_KEY, INTASEND_ENVIRONMENT)) {
+      return jsonResponse({
+        error: `IntaSend ${INTASEND_ENVIRONMENT} configuration mismatch`,
+        details: `Use test keys for sandbox and live keys for live environment.`,
+      }, 500);
     }
 
     const baseUrl = INTASEND_ENVIRONMENT === "live"
       ? "https://payment.intasend.com/api/v1"
       : "https://sandbox.intasend.com/api/v1";
 
-    const { action, phone_number, amount, business_id, plan_slug, billing_period, invoice_id } = await req.json();
+    const payload = await req.json();
+    const { action, phone_number, amount, business_id, plan_slug, billing_period, invoice_id, payment_id } = payload;
 
     // Create Supabase client with service role for DB operations
     const supabase = createClient(
@@ -36,13 +55,11 @@ Deno.serve(async (req) => {
     if (action === "initiate") {
       // Validate inputs
       if (!phone_number || !amount || !business_id || !plan_slug) {
-        return new Response(JSON.stringify({ error: "Missing required fields" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Missing required fields" }, 400);
       }
 
       // Format phone number for IntaSend (254XXXXXXXXX)
-      let formattedPhone = phone_number.replace(/\s+/g, "").replace(/^0/, "254").replace(/^\+/, "");
+      const formattedPhone = formatPhoneNumber(phone_number);
 
       // Initiate STK Push via IntaSend
       const stkResponse = await fetch(`${baseUrl}/payment/mpesa-stk-push/`, {
@@ -63,9 +80,7 @@ Deno.serve(async (req) => {
 
       if (!stkResponse.ok) {
         console.error("IntaSend STK error:", stkData);
-        return new Response(JSON.stringify({ error: "Failed to initiate M-Pesa payment", details: stkData }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Failed to initiate M-Pesa payment", details: stkData }, 400);
       }
 
       // Save payment record
@@ -84,23 +99,17 @@ Deno.serve(async (req) => {
         console.error("DB insert error:", dbError);
       }
 
-      return new Response(JSON.stringify({
+      return jsonResponse({
         success: true,
         payment_id: payment?.id,
         checkout_request_id: stkData.id || stkData.checkout_request_id,
         invoice_id: stkData.invoice?.invoice_id || stkData.invoice_id,
-      }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (action === "check_status") {
-      const { payment_id } = await req.json().catch(() => ({ payment_id: null }));
-
       if (!invoice_id && !payment_id) {
-        return new Response(JSON.stringify({ error: "invoice_id or payment_id required" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "invoice_id or payment_id required" }, 400);
       }
 
       // Check payment status from IntaSend
@@ -152,26 +161,18 @@ Deno.serve(async (req) => {
           });
         }
 
-        return new Response(JSON.stringify({ status: "completed", data: statusData }), {
-          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return jsonResponse({ status: "completed", data: statusData });
       }
 
-      return new Response(JSON.stringify({
+      return jsonResponse({
         status: statusData.invoice?.state?.toLowerCase() || "pending",
         data: statusData,
-      }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ error: "Invalid action" }), {
-      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Invalid action" }, 400);
   } catch (err) {
     console.error("Edge function error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: err.message }, 500);
   }
 });
