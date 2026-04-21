@@ -13,6 +13,9 @@ const jsonResponse = (body: Record<string, unknown>, status = 200) =>
 const formatPhoneNumber = (phoneNumber: string) =>
   phoneNumber.replace(/\s+/g, "").replace(/^0/, "254").replace(/^\+/, "");
 
+const sanitizeSecret = (value: string | undefined) =>
+  value?.trim().replace(/^['"`]+|['"`]+$/g, "").replace(/[\r\n\t]+/g, "");
+
 const normalizeEnvironment = (value: string | undefined) => {
   const raw = (value || "").toLowerCase().trim();
   return ["live", "production", "prod"].includes(raw) ? "live" : "sandbox";
@@ -23,6 +26,13 @@ const getKeyMode = (value: string) => {
   if (value.includes("_test_")) return "test";
   return "unknown";
 };
+
+const getSafeKeyMeta = (value: string) => ({
+  mode: getKeyMode(value),
+  length: value.length,
+  prefix: value.slice(0, 18),
+  suffix: value.slice(-6),
+});
 
 const resolveIntaSendCredentials = (
   firstKey: string,
@@ -40,8 +50,8 @@ const resolveIntaSendCredentials = (
     expectedMode,
     secretToken,
     publishableToken,
-    firstKeyMode: getKeyMode(firstKey),
-    secondKeyMode: getKeyMode(secondKey),
+    firstKeyMeta: getSafeKeyMeta(firstKey),
+    secondKeyMeta: getSafeKeyMeta(secondKey),
   };
 };
 
@@ -51,8 +61,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY")?.trim();
-    const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY")?.trim();
+    const INTASEND_API_KEY = sanitizeSecret(Deno.env.get("INTASEND_API_KEY"));
+    const INTASEND_PUBLISHABLE_KEY = sanitizeSecret(Deno.env.get("INTASEND_PUBLISHABLE_KEY"));
     const INTASEND_ENVIRONMENT = normalizeEnvironment(Deno.env.get("INTASEND_ENVIRONMENT"));
 
     if (!INTASEND_API_KEY || !INTASEND_PUBLISHABLE_KEY) {
@@ -66,9 +76,15 @@ Deno.serve(async (req) => {
     );
 
     if (!credentials.secretToken || !credentials.publishableToken) {
+      console.error("IntaSend credential mismatch", {
+        environment: INTASEND_ENVIRONMENT,
+        apiKey: credentials.firstKeyMeta,
+        publishableKey: credentials.secondKeyMeta,
+      });
+
       return jsonResponse({
         error: "IntaSend key/environment mismatch",
-        details: `Environment is ${INTASEND_ENVIRONMENT}. Expected one live/test secret key and one matching publishable key. Found key modes: INTASEND_API_KEY=${credentials.firstKeyMode}, INTASEND_PUBLISHABLE_KEY=${credentials.secondKeyMode}.`,
+        details: `Environment is ${INTASEND_ENVIRONMENT}. Expected one matching secret key and one publishable key for this mode.`,
       }, 500);
     }
 
