@@ -26,20 +26,25 @@ Deno.serve(async (req) => {
   try {
     const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY");
     const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
-    const INTASEND_ENVIRONMENT = Deno.env.get("INTASEND_ENVIRONMENT") === "live" ? "live" : "sandbox";
+    const rawEnv = (Deno.env.get("INTASEND_ENVIRONMENT") || "").toLowerCase().trim();
+    const isLive = ["live", "production", "prod"].includes(rawEnv);
+    const INTASEND_ENVIRONMENT = isLive ? "live" : "sandbox";
 
     if (!INTASEND_API_KEY || !INTASEND_PUBLISHABLE_KEY) {
       return jsonResponse({ error: "IntaSend keys not configured" }, 500);
     }
 
-    if (!keysMatchEnvironment(INTASEND_API_KEY, INTASEND_PUBLISHABLE_KEY, INTASEND_ENVIRONMENT)) {
+    // Validate key prefixes match environment (IntaSend uses ISPubKey_live_ / ISPubKey_test_)
+    const keyEnv = INTASEND_API_KEY.includes("_live_") || INTASEND_PUBLISHABLE_KEY.includes("_live_") ? "live" : "test";
+    const expectedKeyEnv = isLive ? "live" : "test";
+    if (keyEnv !== expectedKeyEnv) {
       return jsonResponse({
-        error: `IntaSend ${INTASEND_ENVIRONMENT} configuration mismatch`,
-        details: `Use test keys for sandbox and live keys for live environment.`,
+        error: `IntaSend key/environment mismatch`,
+        details: `INTASEND_ENVIRONMENT is "${rawEnv}" (treated as ${INTASEND_ENVIRONMENT}) but your API keys are ${keyEnv} keys. Use ${expectedKeyEnv} keys, or set INTASEND_ENVIRONMENT to "${keyEnv === "live" ? "production" : "sandbox"}".`,
       }, 500);
     }
 
-    const baseUrl = INTASEND_ENVIRONMENT === "live"
+    const baseUrl = isLive
       ? "https://payment.intasend.com/api/v1"
       : "https://sandbox.intasend.com/api/v1";
 
