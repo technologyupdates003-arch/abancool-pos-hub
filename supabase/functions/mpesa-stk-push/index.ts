@@ -89,9 +89,7 @@ Deno.serve(async (req) => {
     }
 
     const authToken = credentials.secretToken;
-    const baseUrl = INTASEND_ENVIRONMENT === "live"
-      ? "https://payment.intasend.com/api/v1"
-      : "https://sandbox.intasend.com/api/v1";
+    const baseUrl = "https://api.intasend.com/api/v1";
 
     const payload = await req.json();
     const { action, phone_number, amount, business_id, plan_slug, billing_period, invoice_id, payment_id } = payload;
