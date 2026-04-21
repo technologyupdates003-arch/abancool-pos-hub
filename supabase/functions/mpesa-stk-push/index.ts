@@ -173,6 +173,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: "Invalid action" }, 400);
   } catch (err) {
     console.error("Edge function error:", err);
-    return jsonResponse({ error: err.message }, 500);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return jsonResponse({ error: message }, 500);
   }
 });
