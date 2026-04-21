@@ -51,8 +51,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY");
-    const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
+    const INTASEND_API_KEY = Deno.env.get("INTASEND_API_KEY")?.trim();
+    const INTASEND_PUBLISHABLE_KEY = Deno.env.get("INTASEND_PUBLISHABLE_KEY")?.trim();
     const INTASEND_ENVIRONMENT = normalizeEnvironment(Deno.env.get("INTASEND_ENVIRONMENT"));
 
     if (!INTASEND_API_KEY || !INTASEND_PUBLISHABLE_KEY) {
