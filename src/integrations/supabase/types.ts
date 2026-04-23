@@ -420,6 +420,7 @@ export type Database = {
           price: number
           sku: string | null
           stock_quantity: number | null
+          supplier_id: string | null
           updated_at: string
         }
         Insert: {
@@ -437,6 +438,7 @@ export type Database = {
           price?: number
           sku?: string | null
           stock_quantity?: number | null
+          supplier_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -454,6 +456,7 @@ export type Database = {
           price?: number
           sku?: string | null
           stock_quantity?: number | null
+          supplier_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -545,6 +548,48 @@ export type Database = {
           },
         ]
       }
+      stock_movements: {
+        Row: {
+          business_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          movement_type: string
+          notes: string | null
+          product_id: string
+          quantity: number
+          reference: string | null
+          supplier_id: string | null
+          unit_cost: number | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          movement_type: string
+          notes?: string | null
+          product_id: string
+          quantity: number
+          reference?: string | null
+          supplier_id?: string | null
+          unit_cost?: number | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          product_id?: string
+          quantity?: number
+          reference?: string | null
+          supplier_id?: string | null
+          unit_cost?: number | null
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           created_at: string
@@ -583,6 +628,48 @@ export type Database = {
           price_monthly?: number
           price_yearly?: number
           slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          business_id: string
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          business_id: string
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          business_id?: string
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
