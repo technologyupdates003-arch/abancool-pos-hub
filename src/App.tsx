@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BusinessProvider } from "@/contexts/BusinessContext";
-import { ProtectedRoute, AdminRoute } from "@/components/ProtectedRoute";
+import { ProtectedRoute, AdminRoute, ManagerRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Solutions from "./pages/Solutions";
@@ -21,6 +21,8 @@ import Staff from "./pages/dashboard/Staff";
 import Reports from "./pages/dashboard/Reports";
 import SettingsPage from "./pages/dashboard/Settings";
 import Subscribe from "./pages/dashboard/Subscribe";
+import Suppliers from "./pages/dashboard/Suppliers";
+import Stock from "./pages/dashboard/Stock";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminBusinesses from "./pages/admin/AdminBusinesses";
 import AdminBusinessDetail from "./pages/admin/AdminBusinessDetail";
@@ -50,14 +52,16 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<ProtectedRoute><DashboardHome /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><ManagerRoute><DashboardHome /></ManagerRoute></ProtectedRoute>} />
               <Route path="/dashboard/pos" element={<ProtectedRoute><POSInterface /></ProtectedRoute>} />
-              <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-              <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-              <Route path="/dashboard/staff" element={<ProtectedRoute><Staff /></ProtectedRoute>} />
-              <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-              <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/dashboard/subscribe" element={<ProtectedRoute><Subscribe /></ProtectedRoute>} />
+              <Route path="/dashboard/products" element={<ProtectedRoute><ManagerRoute><Products /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/orders" element={<ProtectedRoute><ManagerRoute><Orders /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/staff" element={<ProtectedRoute><ManagerRoute><Staff /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/reports" element={<ProtectedRoute><ManagerRoute><Reports /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/settings" element={<ProtectedRoute><ManagerRoute><SettingsPage /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/subscribe" element={<ProtectedRoute><ManagerRoute><Subscribe /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/suppliers" element={<ProtectedRoute><ManagerRoute><Suppliers /></ManagerRoute></ProtectedRoute>} />
+              <Route path="/dashboard/stock" element={<ProtectedRoute><ManagerRoute><Stock /></ManagerRoute></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
               <Route path="/admin/businesses" element={<AdminRoute><AdminBusinesses /></AdminRoute>} />
               <Route path="/admin/businesses/:id" element={<AdminRoute><AdminBusinessDetail /></AdminRoute>} />

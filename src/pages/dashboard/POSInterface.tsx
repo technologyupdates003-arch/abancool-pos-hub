@@ -165,13 +165,28 @@ const POSInterface = () => {
     }));
     await supabase.from("order_items").insert(items);
 
+    // Update stock + record stock movements (sales)
+    const movements: any[] = [];
     for (const item of cart) {
       const prod = products.find(p => p.id === item.product_id);
       if (prod) {
         await supabase.from("products").update({
           stock_quantity: Math.max(0, prod.stock_quantity - item.quantity)
         }).eq("id", item.product_id);
+
+        movements.push({
+          business_id: business.id,
+          product_id: item.product_id,
+          movement_type: "sale",
+          quantity: -item.quantity,
+          unit_cost: Number(prod.cost_price ?? 0),
+          reference: orderNumber,
+          created_by: user.id,
+        });
       }
+    }
+    if (movements.length > 0) {
+      await supabase.from("stock_movements").insert(movements);
     }
 
     setLastOrder({
