@@ -12,21 +12,24 @@ const Products = () => {
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", description: "" });
+  const [form, setForm] = useState({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", supplier_id: "", description: "" });
 
   const canManage = memberRole === "owner" || memberRole === "manager";
 
   const fetchData = async () => {
     if (!business) return;
-    const [{ data: prods }, { data: cats }] = await Promise.all([
+    const [{ data: prods }, { data: cats }, { data: sups }] = await Promise.all([
       supabase.from("products").select("*, categories(name)").eq("business_id", business.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("*").eq("business_id", business.id),
+      supabase.from("suppliers").select("id, name").eq("business_id", business.id).eq("is_active", true).order("name"),
     ]);
     setProducts(prods ?? []);
     setCategories(cats ?? []);
+    setSuppliers(sups ?? []);
   };
 
   useEffect(() => { fetchData(); }, [business]);
@@ -43,6 +46,7 @@ const Products = () => {
       barcode: form.barcode || null,
       stock_quantity: parseInt(form.stock_quantity) || 0,
       category_id: form.category_id || null,
+      supplier_id: form.supplier_id || null,
       description: form.description || null,
     };
 
@@ -54,7 +58,7 @@ const Products = () => {
       toast({ title: "Product added" });
     }
     setShowForm(false); setEditId(null);
-    setForm({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", description: "" });
+    setForm({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", supplier_id: "", description: "" });
     fetchData();
   };
 
@@ -68,7 +72,7 @@ const Products = () => {
     setForm({
       name: p.name, price: String(p.price), cost_price: String(p.cost_price ?? ""),
       sku: p.sku ?? "", barcode: p.barcode ?? "", stock_quantity: String(p.stock_quantity ?? 0),
-      category_id: p.category_id ?? "", description: p.description ?? "",
+      category_id: p.category_id ?? "", supplier_id: p.supplier_id ?? "", description: p.description ?? "",
     });
     setEditId(p.id); setShowForm(true);
   };
@@ -81,7 +85,7 @@ const Products = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold">Products</h1>
         {canManage && (
-          <Button variant="hero" size="sm" onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", description: "" }); }}>
+          <Button variant="hero" size="sm" onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", price: "", cost_price: "", sku: "", barcode: "", stock_quantity: "", category_id: "", supplier_id: "", description: "" }); }}>
             <Plus size={16} /> Add Product
           </Button>
         )}
@@ -100,6 +104,10 @@ const Products = () => {
             <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               <option value="">No category</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <select value={form.supplier_id} onChange={(e) => setForm({ ...form, supplier_id: e.target.value })} className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">No supplier</option>
+              {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
             <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
             <div className="sm:col-span-2 flex gap-2">
