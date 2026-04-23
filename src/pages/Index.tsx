@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Wine, Smartphone } from "lucide-react";
+import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Smartphone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImg from "@/assets/hero-pos.jpg";
 import retailImg from "@/assets/retail-pos.jpg";
-import barImg from "@/assets/bar-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
 
 const solutions = [
@@ -14,12 +13,6 @@ const solutions = [
     desc: "Barcode scanning, inventory tracking, fast checkout, and receipt generation for shops of any size.",
     icon: Store,
     img: retailImg,
-  },
-  {
-    title: "Bar & Liquor POS",
-    desc: "Tab management, happy hour pricing, quick-order buttons, and drink category management.",
-    icon: Wine,
-    img: barImg,
   },
   {
     title: "Restaurant POS",

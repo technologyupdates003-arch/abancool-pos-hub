@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBusiness } from "@/contexts/BusinessContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, Trash2, Search, X, Printer } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, Search, X, Printer, LogOut, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SubscriptionGate from "@/components/SubscriptionGate";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface CartItem {
   product_id: string;
@@ -18,7 +20,8 @@ interface CartItem {
 
 const POSInterface = () => {
   const { business, isSubscribed } = useBusiness();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -30,6 +33,14 @@ const POSInterface = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [lastOrder, setLastOrder] = useState<{ orderNumber: string; items: CartItem[]; subtotal: number; tax: number; total: number; paymentMethod: string; date: string } | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
+  const [mpesaPhone, setMpesaPhone] = useState("");
+  const [showMpesaPrompt, setShowMpesaPrompt] = useState(false);
+  const [mpesaWaiting, setMpesaWaiting] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!business) return;
@@ -123,10 +134,8 @@ const POSInterface = () => {
     receiptWindow.document.close();
   };
 
-  const handleCheckout = async () => {
-    if (!business || !user || cart.length === 0) return;
-    setProcessing(true);
-
+  const completeOrder = async (extras: { mpesa_request_id?: string; mpesa_receipt?: string } = {}) => {
+    if (!business || !user) return;
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
     const { data: order, error } = await supabase.from("orders").insert({
@@ -138,12 +147,13 @@ const POSInterface = () => {
       total,
       payment_method: paymentMethod,
       status: "completed" as any,
+      mpesa_request_id: extras.mpesa_request_id ?? null,
+      mpesa_receipt: extras.mpesa_receipt ?? null,
     }).select().single();
 
     if (error || !order) {
       toast({ title: "Order failed", description: error?.message, variant: "destructive" });
-      setProcessing(false);
-      return;
+      return false;
     }
 
     const items = cart.map((i) => ({
@@ -167,18 +177,80 @@ const POSInterface = () => {
     setLastOrder({
       orderNumber,
       items: [...cart],
-      subtotal,
-      tax,
-      total,
-      paymentMethod,
+      subtotal, tax, total, paymentMethod,
       date: new Date().toLocaleString(),
     });
 
     toast({ title: "Order complete!", description: `${orderNumber} — KES ${total.toLocaleString()}` });
     setCart([]);
     setShowCheckout(false);
+    return true;
+  };
+
+  const handleCheckout = async () => {
+    if (!business || !user || cart.length === 0) return;
+
+    if (paymentMethod === "mpesa") {
+      // Open M-Pesa phone prompt — actual STK happens after user enters phone
+      setShowMpesaPrompt(true);
+      return;
+    }
+
+    setProcessing(true);
+    await completeOrder();
     setProcessing(false);
   };
+
+  const handleMpesaPay = async () => {
+    if (!business || !mpesaPhone) return;
+    setMpesaWaiting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("mpesa-business-stk", {
+        body: {
+          action: "initiate",
+          phone_number: mpesaPhone,
+          amount: total,
+          business_id: business.id,
+          reference: `POS-${Date.now()}`,
+        },
+      });
+
+      if (error || !data?.success) {
+        toast({ title: "M-Pesa failed", description: data?.error || error?.message || "Could not start STK push", variant: "destructive" });
+        setMpesaWaiting(false);
+        return;
+      }
+
+      toast({ title: "STK Push sent", description: "Customer should enter M-Pesa PIN on their phone." });
+
+      // Poll status
+      const reqId = data.checkout_request_id;
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        const { data: s } = await supabase.functions.invoke("mpesa-business-stk", {
+          body: { action: "check_status", business_id: business.id, checkout_request_id: reqId },
+        });
+
+        if (s?.status === "completed") {
+          clearInterval(interval);
+          await completeOrder({ mpesa_request_id: reqId, mpesa_receipt: s.mpesa_receipt });
+          setMpesaWaiting(false);
+          setShowMpesaPrompt(false);
+          setMpesaPhone("");
+        } else if (s?.status === "failed" || attempts >= 18) {
+          clearInterval(interval);
+          setMpesaWaiting(false);
+          toast({ title: "Payment not confirmed", description: s?.message || "Customer did not complete payment.", variant: "destructive" });
+        }
+      }, 4000);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+      setMpesaWaiting(false);
+    }
+  };
+
 
   const filtered = products.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -215,6 +287,13 @@ const POSInterface = () => {
               {cart.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">{cart.length}</span>
               )}
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="ml-2 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-body text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+              title="Sign out of POS"
+            >
+              <LogOut size={14} /> <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
 
@@ -325,6 +404,40 @@ const POSInterface = () => {
                 Done
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer M-Pesa STK prompt */}
+      <Dialog open={showMpesaPrompt} onOpenChange={(o) => { if (!mpesaWaiting) { setShowMpesaPrompt(o); if (!o) setMpesaPhone(""); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Charge via M-Pesa</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="rounded-lg bg-muted p-4 text-sm font-body">
+              <p>Amount: <span className="font-semibold text-primary">KES {total.toLocaleString()}</span></p>
+              <p className="text-xs text-muted-foreground mt-1">An STK Push prompt will appear on the customer's phone.</p>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground font-body">Customer M-Pesa Phone</label>
+              <Input
+                placeholder="0712345678"
+                value={mpesaPhone}
+                onChange={(e) => setMpesaPhone(e.target.value)}
+                disabled={mpesaWaiting}
+              />
+            </div>
+            {mpesaWaiting ? (
+              <div className="text-center py-3 space-y-2">
+                <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
+                <p className="text-xs text-muted-foreground">Waiting for customer to enter PIN…</p>
+              </div>
+            ) : (
+              <Button variant="hero" className="w-full" onClick={handleMpesaPay} disabled={!mpesaPhone}>
+                Send STK Push
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
