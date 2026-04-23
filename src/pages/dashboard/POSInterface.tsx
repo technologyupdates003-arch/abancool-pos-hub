@@ -134,10 +134,8 @@ const POSInterface = () => {
     receiptWindow.document.close();
   };
 
-  const handleCheckout = async () => {
-    if (!business || !user || cart.length === 0) return;
-    setProcessing(true);
-
+  const completeOrder = async (extras: { mpesa_request_id?: string; mpesa_receipt?: string } = {}) => {
+    if (!business || !user) return;
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
     const { data: order, error } = await supabase.from("orders").insert({
@@ -149,12 +147,13 @@ const POSInterface = () => {
       total,
       payment_method: paymentMethod,
       status: "completed" as any,
+      mpesa_request_id: extras.mpesa_request_id ?? null,
+      mpesa_receipt: extras.mpesa_receipt ?? null,
     }).select().single();
 
     if (error || !order) {
       toast({ title: "Order failed", description: error?.message, variant: "destructive" });
-      setProcessing(false);
-      return;
+      return false;
     }
 
     const items = cart.map((i) => ({
@@ -178,18 +177,80 @@ const POSInterface = () => {
     setLastOrder({
       orderNumber,
       items: [...cart],
-      subtotal,
-      tax,
-      total,
-      paymentMethod,
+      subtotal, tax, total, paymentMethod,
       date: new Date().toLocaleString(),
     });
 
     toast({ title: "Order complete!", description: `${orderNumber} — KES ${total.toLocaleString()}` });
     setCart([]);
     setShowCheckout(false);
+    return true;
+  };
+
+  const handleCheckout = async () => {
+    if (!business || !user || cart.length === 0) return;
+
+    if (paymentMethod === "mpesa") {
+      // Open M-Pesa phone prompt — actual STK happens after user enters phone
+      setShowMpesaPrompt(true);
+      return;
+    }
+
+    setProcessing(true);
+    await completeOrder();
     setProcessing(false);
   };
+
+  const handleMpesaPay = async () => {
+    if (!business || !mpesaPhone) return;
+    setMpesaWaiting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("mpesa-business-stk", {
+        body: {
+          action: "initiate",
+          phone_number: mpesaPhone,
+          amount: total,
+          business_id: business.id,
+          reference: `POS-${Date.now()}`,
+        },
+      });
+
+      if (error || !data?.success) {
+        toast({ title: "M-Pesa failed", description: data?.error || error?.message || "Could not start STK push", variant: "destructive" });
+        setMpesaWaiting(false);
+        return;
+      }
+
+      toast({ title: "STK Push sent", description: "Customer should enter M-Pesa PIN on their phone." });
+
+      // Poll status
+      const reqId = data.checkout_request_id;
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        const { data: s } = await supabase.functions.invoke("mpesa-business-stk", {
+          body: { action: "check_status", business_id: business.id, checkout_request_id: reqId },
+        });
+
+        if (s?.status === "completed") {
+          clearInterval(interval);
+          await completeOrder({ mpesa_request_id: reqId, mpesa_receipt: s.mpesa_receipt });
+          setMpesaWaiting(false);
+          setShowMpesaPrompt(false);
+          setMpesaPhone("");
+        } else if (s?.status === "failed" || attempts >= 18) {
+          clearInterval(interval);
+          setMpesaWaiting(false);
+          toast({ title: "Payment not confirmed", description: s?.message || "Customer did not complete payment.", variant: "destructive" });
+        }
+      }, 4000);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+      setMpesaWaiting(false);
+    }
+  };
+
 
   const filtered = products.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
