@@ -20,7 +20,8 @@ interface CartItem {
 
 const POSInterface = () => {
   const { business, isSubscribed } = useBusiness();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -32,6 +33,14 @@ const POSInterface = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [lastOrder, setLastOrder] = useState<{ orderNumber: string; items: CartItem[]; subtotal: number; tax: number; total: number; paymentMethod: string; date: string } | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
+  const [mpesaPhone, setMpesaPhone] = useState("");
+  const [showMpesaPrompt, setShowMpesaPrompt] = useState(false);
+  const [mpesaWaiting, setMpesaWaiting] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!business) return;
