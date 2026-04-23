@@ -115,6 +115,45 @@ export type Database = {
           },
         ]
       }
+      business_payment_settings: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          mpesa_consumer_key: string | null
+          mpesa_consumer_secret: string | null
+          mpesa_enabled: boolean
+          mpesa_environment: string
+          mpesa_passkey: string | null
+          mpesa_shortcode: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          mpesa_consumer_key?: string | null
+          mpesa_consumer_secret?: string | null
+          mpesa_enabled?: boolean
+          mpesa_environment?: string
+          mpesa_passkey?: string | null
+          mpesa_shortcode?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          mpesa_consumer_key?: string | null
+          mpesa_consumer_secret?: string | null
+          mpesa_enabled?: boolean
+          mpesa_environment?: string
+          mpesa_passkey?: string | null
+          mpesa_shortcode?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       businesses: {
         Row: {
           address: string | null
@@ -257,6 +296,8 @@ export type Database = {
           customer_phone: string | null
           discount: number | null
           id: string
+          mpesa_receipt: string | null
+          mpesa_request_id: string | null
           notes: string | null
           order_number: string
           payment_method: string | null
@@ -275,6 +316,8 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          mpesa_receipt?: string | null
+          mpesa_request_id?: string | null
           notes?: string | null
           order_number: string
           payment_method?: string | null
@@ -293,6 +336,8 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          mpesa_receipt?: string | null
+          mpesa_request_id?: string | null
           notes?: string | null
           order_number?: string
           payment_method?: string | null
