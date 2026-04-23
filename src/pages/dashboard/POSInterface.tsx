@@ -288,6 +288,13 @@ const POSInterface = () => {
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">{cart.length}</span>
               )}
             </button>
+            <button
+              onClick={handleSignOut}
+              className="ml-2 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-body text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+              title="Sign out of POS"
+            >
+              <LogOut size={14} /> <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
 
           <div className="p-4 space-y-3">
