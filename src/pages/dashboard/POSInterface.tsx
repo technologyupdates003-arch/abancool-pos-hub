@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBusiness } from "@/contexts/BusinessContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, Trash2, Search, X, Printer } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, Search, X, Printer, LogOut, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SubscriptionGate from "@/components/SubscriptionGate";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface CartItem {
   product_id: string;
