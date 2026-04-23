@@ -1,13 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor, CreditCard } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor, CreditCard, Truck, Boxes } from "lucide-react";
 import { ReactNode, useState } from "react";
 
-const navItems = [
+const ALL_NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
   { label: "POS", icon: Monitor, to: "/dashboard/pos" },
   { label: "Products", icon: Package, to: "/dashboard/products" },
+  { label: "Stock", icon: Boxes, to: "/dashboard/stock" },
+  { label: "Suppliers", icon: Truck, to: "/dashboard/suppliers" },
   { label: "Orders", icon: ShoppingCart, to: "/dashboard/orders" },
   { label: "Staff", icon: Users, to: "/dashboard/staff" },
   { label: "Reports", icon: BarChart3, to: "/dashboard/reports" },
@@ -15,12 +17,18 @@ const navItems = [
   { label: "Settings", icon: Settings, to: "/dashboard/settings" },
 ];
 
+// Cashiers see only the POS terminal
+const CASHIER_NAV_ITEMS = ALL_NAV_ITEMS.filter((i) => i.to === "/dashboard/pos");
+
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const { profile, signOut, isAdmin } = useAuth();
-  const { business, businesses, selectBusiness } = useBusiness();
+  const { business, businesses, selectBusiness, memberRole } = useBusiness();
   const location = useLocation();
   const navigate = useNavigate();
   const [bizOpen, setBizOpen] = useState(false);
+
+  const isCashier = memberRole === "cashier";
+  const navItems = isCashier ? CASHIER_NAV_ITEMS : ALL_NAV_ITEMS;
 
   const handleSignOut = async () => {
     await signOut();
