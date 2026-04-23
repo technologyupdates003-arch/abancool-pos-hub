@@ -407,6 +407,40 @@ const POSInterface = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Customer M-Pesa STK prompt */}
+      <Dialog open={showMpesaPrompt} onOpenChange={(o) => { if (!mpesaWaiting) { setShowMpesaPrompt(o); if (!o) setMpesaPhone(""); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Charge via M-Pesa</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="rounded-lg bg-muted p-4 text-sm font-body">
+              <p>Amount: <span className="font-semibold text-primary">KES {total.toLocaleString()}</span></p>
+              <p className="text-xs text-muted-foreground mt-1">An STK Push prompt will appear on the customer's phone.</p>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground font-body">Customer M-Pesa Phone</label>
+              <Input
+                placeholder="0712345678"
+                value={mpesaPhone}
+                onChange={(e) => setMpesaPhone(e.target.value)}
+                disabled={mpesaWaiting}
+              />
+            </div>
+            {mpesaWaiting ? (
+              <div className="text-center py-3 space-y-2">
+                <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
+                <p className="text-xs text-muted-foreground">Waiting for customer to enter PIN…</p>
+              </div>
+            ) : (
+              <Button variant="hero" className="w-full" onClick={handleMpesaPay} disabled={!mpesaPhone}>
+                Send STK Push
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
