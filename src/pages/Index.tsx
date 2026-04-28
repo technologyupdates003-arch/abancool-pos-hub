@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Smartphone } from "lucide-react";
+import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Smartphone, Pill } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImg from "@/assets/hero-pos.jpg";
 import retailImg from "@/assets/retail-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
+import pharmacyImg from "@/assets/pharmacy-pos.jpg";
 
 const solutions = [
   {
@@ -19,6 +20,12 @@ const solutions = [
     desc: "Table management, kitchen display, order tracking, split bills, and waiter assignment.",
     icon: UtensilsCrossed,
     img: restaurantImg,
+  },
+  {
+    title: "Pharmacy POS",
+    desc: "Prescription tracking, batch & expiry management, drug inventory, supplier orders, and compliant receipts.",
+    icon: Pill,
+    img: pharmacyImg,
   },
 ];
 

@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Store, Wine, UtensilsCrossed, Briefcase } from "lucide-react";
+import { Eye, EyeOff, Store, Pill, UtensilsCrossed, Briefcase, Wine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const businessTypes = [
   { value: "retail", label: "Retail Shop", icon: Store },
-  { value: "bar", label: "Bar / Liquor", icon: Wine },
   { value: "restaurant", label: "Restaurant", icon: UtensilsCrossed },
+  { value: "pharmacy", label: "Pharmacy", icon: Pill },
   { value: "general", label: "General Business", icon: Briefcase },
+  { value: "bar", label: "Bar / Liquor", icon: Wine },
 ] as const;
 
 const Register = () => {
