@@ -74,7 +74,7 @@ const Contact = () => {
                 <MapPin size={20} className="text-primary mt-1" />
                 <div>
                   <p className="font-heading font-semibold">Location</p>
-                  <p className="text-sm text-muted-foreground font-body">Nairobi, Kenya</p>
+                  <p className="text-sm text-muted-foreground font-body">Garissa & Kerugoya, Kenya</p>
                 </div>
               </div>
             </div>
