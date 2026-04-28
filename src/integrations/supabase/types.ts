@@ -739,7 +739,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      business_type: "retail" | "bar" | "restaurant" | "general"
+      business_type: "retail" | "bar" | "restaurant" | "general" | "pharmacy"
       member_role: "owner" | "manager" | "cashier"
       order_status:
         | "pending"
@@ -883,7 +883,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      business_type: ["retail", "bar", "restaurant", "general"],
+      business_type: ["retail", "bar", "restaurant", "general", "pharmacy"],
       member_role: ["owner", "manager", "cashier"],
       order_status: [
         "pending",

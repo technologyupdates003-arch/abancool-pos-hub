@@ -2,9 +2,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Store, UtensilsCrossed, ArrowRight, Check } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowRight, Check, Pill } from "lucide-react";
 import retailImg from "@/assets/retail-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
+import pharmacyImg from "@/assets/pharmacy-pos.jpg";
 
 const solutions = [
   {
@@ -18,6 +19,12 @@ const solutions = [
     icon: UtensilsCrossed,
     img: restaurantImg,
     features: ["Table management", "Kitchen Display System", "Order tracking", "Waiter assignment", "Split bills", "Order statuses"],
+  },
+  {
+    title: "Pharmacy POS",
+    icon: Pill,
+    img: pharmacyImg,
+    features: ["Prescription tracking", "Batch & expiry management", "Drug inventory control", "Supplier & purchase orders", "Low-stock alerts", "Compliant receipts"],
   },
 ];
 
