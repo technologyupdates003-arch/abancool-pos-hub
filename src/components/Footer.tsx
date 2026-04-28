@@ -23,7 +23,7 @@ const Footer = () => (
               <Phone size={14} className="text-primary" /> 0111 679 286 / 0728 825 152
             </a>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin size={14} className="text-primary" /> Nairobi, Kenya
+              <MapPin size={14} className="text-primary" /> Garissa & Kerugoya, Kenya
             </div>
           </div>
         </div>
