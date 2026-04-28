@@ -2,9 +2,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Store, Wine, UtensilsCrossed, ArrowRight, Check } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowRight, Check } from "lucide-react";
 import retailImg from "@/assets/retail-pos.jpg";
-import barImg from "@/assets/bar-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
 
 const solutions = [
@@ -13,12 +12,6 @@ const solutions = [
     icon: Store,
     img: retailImg,
     features: ["Barcode scanning", "Cart system & fast checkout", "Receipt generation", "Stock auto-deduction", "Supplier management", "Sales reports"],
-  },
-  {
-    title: "Bar & Liquor POS",
-    icon: Wine,
-    img: barImg,
-    features: ["Drink categories", "Quick order buttons", "Happy hour pricing", "Tab system (open/close)", "Real-time inventory", "Staff tracking"],
   },
   {
     title: "Restaurant POS",
