@@ -11,12 +11,50 @@ const PAGE_SIZE = 20;
 const SUPER_ADMIN_EMAIL = "technologyupdates003@gmail.com";
 
 const AdminUsers = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const isSuperAdmin = user?.email?.toLowerCase() === SUPER_ADMIN_EMAIL;
   const [profiles, setProfiles] = useState<any[]>([]);
   const [roles, setRoles] = useState<Record<string, string[]>>({});
   const [memberships, setMemberships] = useState<Record<string, { business_name: string; role: string }[]>>({});
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const reloadRoles = async () => {
+    const { data: userRoles } = await supabase.from("user_roles").select("user_id, role");
+    const rMap: Record<string, string[]> = {};
+    userRoles?.forEach((r) => {
+      if (!rMap[r.user_id]) rMap[r.user_id] = [];
+      rMap[r.user_id].push(r.role);
+    });
+    setRoles(rMap);
+  };
+
+  const promote = async (userId: string) => {
+    setBusy(userId);
+    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
+    setBusy(null);
+    if (error) {
+      toast({ title: "Failed to promote", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Promoted to admin" });
+      reloadRoles();
+    }
+  };
+
+  const demote = async (userId: string) => {
+    setBusy(userId);
+    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
+    setBusy(null);
+    if (error) {
+      toast({ title: "Failed to demote", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Admin role removed" });
+      reloadRoles();
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
