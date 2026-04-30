@@ -122,6 +122,7 @@ const AdminUsers = () => {
                   <th className="text-left px-4 py-3 font-heading font-semibold">System Roles</th>
                   <th className="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Businesses</th>
                   <th className="text-left px-4 py-3 font-heading font-semibold hidden lg:table-cell">Joined</th>
+                  {isSuperAdmin && <th className="text-left px-4 py-3 font-heading font-semibold">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
