@@ -3,9 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ShieldPlus, ShieldMinus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const PAGE_SIZE = 20;
+const SUPER_ADMIN_EMAIL = "technologyupdates003@gmail.com";
 
 const AdminUsers = () => {
   const [profiles, setProfiles] = useState<any[]>([]);
