@@ -149,6 +149,29 @@ const AdminUsers = () => {
                     <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">
                       {new Date(p.created_at).toLocaleDateString()}
                     </td>
+                    {isSuperAdmin && (
+                      <td className="px-4 py-3">
+                        {(roles[p.user_id] ?? []).includes("admin") ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy === p.user_id || p.user_id === user?.id}
+                            onClick={() => demote(p.user_id)}
+                          >
+                            <ShieldMinus size={14} className="mr-1" /> Remove admin
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="hero"
+                            disabled={busy === p.user_id}
+                            onClick={() => promote(p.user_id)}
+                          >
+                            <ShieldPlus size={14} className="mr-1" /> Make admin
+                          </Button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
