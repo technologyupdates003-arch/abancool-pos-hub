@@ -22,13 +22,21 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
-      navigate("/dashboard");
+      return;
     }
+    // Check if user is an admin → land on admin dashboard
+    const uid = data.user?.id;
+    let isAdmin = false;
+    if (uid) {
+      const { data: r } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+      isAdmin = !!r?.some((x: any) => x.role === "admin");
+    }
+    setLoading(false);
+    navigate(isAdmin ? "/admin" : "/dashboard");
   };
 
   return (

@@ -3,17 +3,58 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ShieldPlus, ShieldMinus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const PAGE_SIZE = 20;
+const SUPER_ADMIN_EMAIL = "technologyupdates003@gmail.com";
 
 const AdminUsers = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const isSuperAdmin = user?.email?.toLowerCase() === SUPER_ADMIN_EMAIL;
   const [profiles, setProfiles] = useState<any[]>([]);
   const [roles, setRoles] = useState<Record<string, string[]>>({});
   const [memberships, setMemberships] = useState<Record<string, { business_name: string; role: string }[]>>({});
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const reloadRoles = async () => {
+    const { data: userRoles } = await supabase.from("user_roles").select("user_id, role");
+    const rMap: Record<string, string[]> = {};
+    userRoles?.forEach((r) => {
+      if (!rMap[r.user_id]) rMap[r.user_id] = [];
+      rMap[r.user_id].push(r.role);
+    });
+    setRoles(rMap);
+  };
+
+  const promote = async (userId: string) => {
+    setBusy(userId);
+    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
+    setBusy(null);
+    if (error) {
+      toast({ title: "Failed to promote", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Promoted to admin" });
+      reloadRoles();
+    }
+  };
+
+  const demote = async (userId: string) => {
+    setBusy(userId);
+    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
+    setBusy(null);
+    if (error) {
+      toast({ title: "Failed to demote", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Admin role removed" });
+      reloadRoles();
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -81,6 +122,7 @@ const AdminUsers = () => {
                   <th className="text-left px-4 py-3 font-heading font-semibold">System Roles</th>
                   <th className="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Businesses</th>
                   <th className="text-left px-4 py-3 font-heading font-semibold hidden lg:table-cell">Joined</th>
+                  {isSuperAdmin && <th className="text-left px-4 py-3 font-heading font-semibold">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -107,6 +149,29 @@ const AdminUsers = () => {
                     <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">
                       {new Date(p.created_at).toLocaleDateString()}
                     </td>
+                    {isSuperAdmin && (
+                      <td className="px-4 py-3">
+                        {(roles[p.user_id] ?? []).includes("admin") ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy === p.user_id || p.user_id === user?.id}
+                            onClick={() => demote(p.user_id)}
+                          >
+                            <ShieldMinus size={14} className="mr-1" /> Remove admin
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="hero"
+                            disabled={busy === p.user_id}
+                            onClick={() => promote(p.user_id)}
+                          >
+                            <ShieldPlus size={14} className="mr-1" /> Make admin
+                          </Button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
