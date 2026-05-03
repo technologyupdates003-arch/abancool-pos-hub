@@ -1,10 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor, CreditCard, Truck, Boxes } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store, ChevronDown, Monitor, CreditCard, Truck, Boxes, GraduationCap, BookOpen, CalendarCheck, FileText, DollarSign, Megaphone } from "lucide-react";
 import { ReactNode, useState } from "react";
 
-const ALL_NAV_ITEMS = [
+const POS_NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
   { label: "POS", icon: Monitor, to: "/dashboard/pos" },
   { label: "Products", icon: Package, to: "/dashboard/products" },
@@ -17,8 +17,22 @@ const ALL_NAV_ITEMS = [
   { label: "Settings", icon: Settings, to: "/dashboard/settings" },
 ];
 
+const SCHOOL_NAV_ITEMS = [
+  { label: "Dashboard", icon: LayoutDashboard, to: "/school" },
+  { label: "Students", icon: GraduationCap, to: "/school/students" },
+  { label: "Classes", icon: BookOpen, to: "/school/classes" },
+  { label: "Teachers", icon: Users, to: "/school/teachers" },
+  { label: "Attendance", icon: CalendarCheck, to: "/school/attendance" },
+  { label: "Exams", icon: FileText, to: "/school/exams" },
+  { label: "Fees", icon: DollarSign, to: "/school/fees" },
+  { label: "Announcements", icon: Megaphone, to: "/school/announcements" },
+  { label: "Staff Logins", icon: Users, to: "/dashboard/staff" },
+  { label: "Subscription", icon: CreditCard, to: "/dashboard/subscribe" },
+  { label: "Settings", icon: Settings, to: "/dashboard/settings" },
+];
+
 // Cashiers see only the POS terminal
-const CASHIER_NAV_ITEMS = ALL_NAV_ITEMS.filter((i) => i.to === "/dashboard/pos");
+const CASHIER_NAV_ITEMS = POS_NAV_ITEMS.filter((i) => i.to === "/dashboard/pos");
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const { profile, signOut, isAdmin } = useAuth();
@@ -28,7 +42,9 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [bizOpen, setBizOpen] = useState(false);
 
   const isCashier = memberRole === "cashier";
-  const navItems = isCashier ? CASHIER_NAV_ITEMS : ALL_NAV_ITEMS;
+  const isSchool = business?.type === "school";
+  const baseNav = isSchool ? SCHOOL_NAV_ITEMS : POS_NAV_ITEMS;
+  const navItems = isCashier ? CASHIER_NAV_ITEMS : baseNav;
 
   const handleSignOut = async () => {
     await signOut();
