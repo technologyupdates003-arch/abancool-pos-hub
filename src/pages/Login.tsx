@@ -28,15 +28,31 @@ const Login = () => {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
       return;
     }
-    // Check if user is an admin → land on admin dashboard
     const uid = data.user?.id;
-    let isAdmin = false;
+    let dest = "/dashboard";
     if (uid) {
+      // Admin?
       const { data: r } = await supabase.from("user_roles").select("role").eq("user_id", uid);
-      isAdmin = !!r?.some((x: any) => x.role === "admin");
+      if (r?.some((x: any) => x.role === "admin")) dest = "/admin";
+      else {
+        // School portal user?
+        const [{ data: t }, { data: s }, { data: p }] = await Promise.all([
+          supabase.from("school_teachers").select("id, business_id, businesses!inner(type)").eq("user_id", uid).maybeSingle(),
+          supabase.from("school_students").select("id, business_id, businesses!inner(type)").eq("user_id", uid).maybeSingle(),
+          supabase.from("school_parents").select("id, business_id, businesses!inner(type)").eq("user_id", uid).maybeSingle(),
+        ]);
+        if (t) dest = "/portal/teacher";
+        else if (s) dest = "/portal/student";
+        else if (p) dest = "/portal/parent";
+        else {
+          // School owner/manager → /school
+          const { data: m } = await supabase.from("business_members").select("business_id, businesses!inner(type)").eq("user_id", uid).eq("is_active", true).limit(1).maybeSingle();
+          if ((m as any)?.businesses?.type === "school") dest = "/school";
+        }
+      }
     }
     setLoading(false);
-    navigate(isAdmin ? "/admin" : "/dashboard");
+    navigate(dest);
   };
 
   return (
