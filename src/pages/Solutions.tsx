@@ -2,10 +2,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Store, UtensilsCrossed, ArrowRight, Check, Pill } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowRight, Check, Pill, GraduationCap } from "lucide-react";
 import retailImg from "@/assets/retail-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
 import pharmacyImg from "@/assets/pharmacy-pos.jpg";
+import schoolImg from "@/assets/school-pos.jpg";
 
 const solutions = [
   {
@@ -25,6 +26,12 @@ const solutions = [
     icon: Pill,
     img: pharmacyImg,
     features: ["Prescription tracking", "Batch & expiry management", "Drug inventory control", "Supplier & purchase orders", "Low-stock alerts", "Compliant receipts"],
+  },
+  {
+    title: "School Management System",
+    icon: GraduationCap,
+    img: schoolImg,
+    features: ["Student admissions & profiles", "Classes, teachers & timetable", "Attendance tracking", "Exams, marks & report cards", "Fees with M-Pesa payments", "Parent & student portals"],
   },
 ];
 

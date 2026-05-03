@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Smartphone, Pill } from "lucide-react";
+import { ArrowRight, Zap, Shield, Globe, BarChart3, Store, UtensilsCrossed, Smartphone, Pill, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImg from "@/assets/hero-pos.jpg";
 import retailImg from "@/assets/retail-pos.jpg";
 import restaurantImg from "@/assets/restaurant-pos.jpg";
 import pharmacyImg from "@/assets/pharmacy-pos.jpg";
+import schoolImg from "@/assets/school-pos.jpg";
 
 const solutions = [
   {
@@ -26,6 +27,12 @@ const solutions = [
     desc: "Prescription tracking, batch & expiry management, drug inventory, supplier orders, and compliant receipts.",
     icon: Pill,
     img: pharmacyImg,
+  },
+  {
+    title: "School Management System",
+    desc: "Students, classes, teachers, attendance, exams, fees with M-Pesa, plus parent & student portals — all in one place.",
+    icon: GraduationCap,
+    img: schoolImg,
   },
 ];
 
