@@ -548,6 +548,591 @@ export type Database = {
           },
         ]
       }
+      school_announcements: {
+        Row: {
+          audience: string
+          body: string
+          business_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          target_class_id: string | null
+          title: string
+        }
+        Insert: {
+          audience?: string
+          body: string
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          target_class_id?: string | null
+          title: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          target_class_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_announcements_target_class_id_fkey"
+            columns: ["target_class_id"]
+            isOneToOne: false
+            referencedRelation: "school_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_attendance: {
+        Row: {
+          business_id: string
+          class_id: string | null
+          created_at: string
+          date: string
+          id: string
+          marked_by: string | null
+          notes: string | null
+          status: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+        }
+        Insert: {
+          business_id: string
+          class_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          marked_by?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+        }
+        Update: {
+          business_id?: string
+          class_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          marked_by?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_attendance_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "school_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "school_students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_classes: {
+        Row: {
+          academic_year: string
+          business_id: string
+          class_teacher_id: string | null
+          created_at: string
+          grade_level: string | null
+          id: string
+          name: string
+          stream: string | null
+          updated_at: string
+        }
+        Insert: {
+          academic_year: string
+          business_id: string
+          class_teacher_id?: string | null
+          created_at?: string
+          grade_level?: string | null
+          id?: string
+          name: string
+          stream?: string | null
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string
+          business_id?: string
+          class_teacher_id?: string | null
+          created_at?: string
+          grade_level?: string | null
+          id?: string
+          name?: string
+          stream?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      school_exam_results: {
+        Row: {
+          business_id: string
+          created_at: string
+          entered_by: string | null
+          exam_id: string
+          grade: string | null
+          id: string
+          remarks: string | null
+          score: number
+          student_id: string
+          subject_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          entered_by?: string | null
+          exam_id: string
+          grade?: string | null
+          id?: string
+          remarks?: string | null
+          score?: number
+          student_id: string
+          subject_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          entered_by?: string | null
+          exam_id?: string
+          grade?: string | null
+          id?: string
+          remarks?: string | null
+          score?: number
+          student_id?: string
+          subject_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_exam_results_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "school_exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_exam_results_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "school_students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_exam_results_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "school_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_exams: {
+        Row: {
+          academic_year: string
+          business_id: string
+          created_at: string
+          end_date: string | null
+          exam_type: string | null
+          id: string
+          max_score: number
+          name: string
+          start_date: string | null
+          term: string | null
+        }
+        Insert: {
+          academic_year: string
+          business_id: string
+          created_at?: string
+          end_date?: string | null
+          exam_type?: string | null
+          id?: string
+          max_score?: number
+          name: string
+          start_date?: string | null
+          term?: string | null
+        }
+        Update: {
+          academic_year?: string
+          business_id?: string
+          created_at?: string
+          end_date?: string | null
+          exam_type?: string | null
+          id?: string
+          max_score?: number
+          name?: string
+          start_date?: string | null
+          term?: string | null
+        }
+        Relationships: []
+      }
+      school_fee_invoices: {
+        Row: {
+          academic_year: string
+          balance: number
+          business_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          paid: number
+          status: Database["public"]["Enums"]["fee_status"]
+          student_id: string
+          term: string
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          academic_year: string
+          balance?: number
+          business_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          paid?: number
+          status?: Database["public"]["Enums"]["fee_status"]
+          student_id: string
+          term: string
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string
+          balance?: number
+          business_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          paid?: number
+          status?: Database["public"]["Enums"]["fee_status"]
+          student_id?: string
+          term?: string
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_fee_invoices_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "school_students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_fee_payments: {
+        Row: {
+          amount: number
+          business_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          method: string
+          mpesa_receipt: string | null
+          mpesa_request_id: string | null
+          phone_number: string | null
+          recorded_by: string | null
+          status: string
+          student_id: string
+        }
+        Insert: {
+          amount: number
+          business_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          method?: string
+          mpesa_receipt?: string | null
+          mpesa_request_id?: string | null
+          phone_number?: string | null
+          recorded_by?: string | null
+          status?: string
+          student_id: string
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          method?: string
+          mpesa_receipt?: string | null
+          mpesa_request_id?: string | null
+          phone_number?: string | null
+          recorded_by?: string | null
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_fee_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "school_fee_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_fee_payments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "school_students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_fee_structures: {
+        Row: {
+          academic_year: string
+          amount: number
+          business_id: string
+          class_id: string | null
+          created_at: string
+          id: string
+          item_name: string
+          term: string
+        }
+        Insert: {
+          academic_year: string
+          amount?: number
+          business_id: string
+          class_id?: string | null
+          created_at?: string
+          id?: string
+          item_name: string
+          term: string
+        }
+        Update: {
+          academic_year?: string
+          amount?: number
+          business_id?: string
+          class_id?: string | null
+          created_at?: string
+          id?: string
+          item_name?: string
+          term?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_fee_structures_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "school_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_parent_students: {
+        Row: {
+          parent_id: string
+          student_id: string
+        }
+        Insert: {
+          parent_id: string
+          student_id: string
+        }
+        Update: {
+          parent_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_parent_students_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "school_parents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_parent_students_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "school_students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_parents: {
+        Row: {
+          business_id: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          user_id: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      school_students: {
+        Row: {
+          address: string | null
+          admission_no: string
+          business_id: string
+          class_id: string | null
+          created_at: string
+          date_of_birth: string | null
+          full_name: string
+          gender: string | null
+          guardian_relation: string | null
+          id: string
+          is_active: boolean
+          medical_notes: string | null
+          parent_email: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          photo_url: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          admission_no: string
+          business_id: string
+          class_id?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name: string
+          gender?: string | null
+          guardian_relation?: string | null
+          id?: string
+          is_active?: boolean
+          medical_notes?: string | null
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          photo_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          admission_no?: string
+          business_id?: string
+          class_id?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string
+          gender?: string | null
+          guardian_relation?: string | null
+          id?: string
+          is_active?: boolean
+          medical_notes?: string | null
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          photo_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_students_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "school_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_subjects: {
+        Row: {
+          business_id: string
+          code: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          business_id: string
+          code?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          business_id?: string
+          code?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      school_teachers: {
+        Row: {
+          business_id: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          qualification: string | null
+          subjects: string[] | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          qualification?: string | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          qualification?: string | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       stock_movements: {
         Row: {
           business_id: string
@@ -736,10 +1321,34 @@ export type Database = {
         Args: { _business_id: string; _user_id: string }
         Returns: boolean
       }
+      is_school_parent: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_school_student: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_school_teacher: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
+      parent_owns_student: {
+        Args: { _student_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
-      business_type: "retail" | "bar" | "restaurant" | "general" | "pharmacy"
+      attendance_status: "present" | "absent" | "late" | "excused"
+      business_type:
+        | "retail"
+        | "bar"
+        | "restaurant"
+        | "general"
+        | "pharmacy"
+        | "school"
+      fee_status: "unpaid" | "partial" | "paid" | "overdue"
       member_role: "owner" | "manager" | "cashier"
       order_status:
         | "pending"
@@ -748,6 +1357,7 @@ export type Database = {
         | "served"
         | "completed"
         | "cancelled"
+      school_role: "principal" | "teacher" | "student" | "parent" | "accountant"
       subscription_status:
         | "trial"
         | "active"
@@ -883,7 +1493,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      business_type: ["retail", "bar", "restaurant", "general", "pharmacy"],
+      attendance_status: ["present", "absent", "late", "excused"],
+      business_type: [
+        "retail",
+        "bar",
+        "restaurant",
+        "general",
+        "pharmacy",
+        "school",
+      ],
+      fee_status: ["unpaid", "partial", "paid", "overdue"],
       member_role: ["owner", "manager", "cashier"],
       order_status: [
         "pending",
@@ -893,6 +1512,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      school_role: ["principal", "teacher", "student", "parent", "accountant"],
       subscription_status: [
         "trial",
         "active",
