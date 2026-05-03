@@ -72,7 +72,7 @@ const Register = () => {
       }
 
       toast({ title: "Account created!", description: "Check your email to verify, then subscribe to activate your business." });
-      navigate("/dashboard/subscribe");
+      navigate(form.type === "school" ? "/dashboard/subscribe" : "/dashboard/subscribe");
     }
     setLoading(false);
   };
